@@ -1,0 +1,39 @@
+{
+  "name": "iscrev-xboard",
+  "version": "1.0.0",
+  "description": "Lousa Digital Interativa (PWA & Desktop)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder",
+    "build:web": "powershell -Command \"New-Item -ItemType Directory -Force -Path build_web; Copy-Item -Path src\\* -Destination build_web -Recurse -Force\""
+  },
+  "build": {
+    "appId": "com.iscrevxboard.app",
+    "productName": "iScrev XBoard",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "src/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "keywords": [
+    "whiteboard",
+    "canvas",
+    "electron",
+    "pwa"
+  ],
+  "author": "wsricardo",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}
