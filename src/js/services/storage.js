@@ -5,6 +5,8 @@ class StorageService {
     this.dbName = 'XBoardDB';
     this.storeName = 'sessions';
     this.db = null;
+    this.currentLessonId = null; // Guarda o ID da aula atualmente aberta
+    this.currentLessonTitle = ''; // Guarda o titulo da aula atualmente aberta
     this.initDB();
   }
 
@@ -55,7 +57,7 @@ class StorageService {
 
   // --- Gerenciamento da Biblioteca de Aulas ---
 
-  saveLessonAs(title, callback) {
+  saveLesson(title, callback) {
     if(!this.db || !window.HistoryManager) return;
     
     const tx = this.db.transaction(this.storeName, 'readwrite');
@@ -67,9 +69,12 @@ class StorageService {
       currentIndex: window.HistoryManager.currentIndex
     };
 
-    const newId = `lesson_${Date.now()}`;
+    // Se já houver uma aula carregada, atualiza ela. Senão cria uma nova.
+    const isNew = !this.currentLessonId;
+    const lessonId = this.currentLessonId || `lesson_${Date.now()}`;
+    
     const entry = {
-      id: newId,
+      id: lessonId,
       title: title || 'Aula sem título',
       data: sessionData,
       timestamp: Date.now()
@@ -77,10 +82,12 @@ class StorageService {
 
     const request = store.put(entry);
     request.onsuccess = () => {
-      if(callback) callback(true, entry);
+      this.currentLessonId = lessonId;
+      this.currentLessonTitle = entry.title;
+      if(callback) callback(true, entry, isNew);
     };
     request.onerror = () => {
-      if(callback) callback(false, null);
+      if(callback) callback(false, null, false);
     };
   }
 
@@ -113,6 +120,9 @@ class StorageService {
     request.onsuccess = (e) => {
       const result = e.target.result;
       if(result && result.data && window.HistoryManager) {
+        // Define que esta é a aula ativa agora
+        this.currentLessonId = id;
+        this.currentLessonTitle = result.title;
         // Carrega para a tela
         window.HistoryManager.loadFromStorage(result.data);
         // Sobrescreve o current para a nova lousa ativa

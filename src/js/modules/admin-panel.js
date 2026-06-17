@@ -17,6 +17,9 @@ class AdminPanel {
   bindEvents() {
     this.btnAdmin.addEventListener('click', () => {
       this.refreshList();
+      if(window.StorageService) {
+        this.inputTitle.value = window.StorageService.currentLessonTitle || '';
+      }
       this.dialog.showModal();
     });
 
@@ -29,6 +32,10 @@ class AdminPanel {
         const msg = window.I18n ? window.I18n.t('lib_confirm_new') : "Deseja criar uma nova aula em branco? Qualquer alteração não salva na atual será perdida!";
         if(confirm(msg)) {
           this.inputTitle.value = '';
+          if(window.StorageService) {
+            window.StorageService.currentLessonId = null;
+            window.StorageService.currentLessonTitle = '';
+          }
           if(window.HistoryManager) {
             window.HistoryManager.boards = [{ id: Date.now(), strokes: [], redoStack: [], bg: { type: 'solid', color: '#1e1e1e' } }];
             window.HistoryManager.currentIndex = 0;
@@ -47,11 +54,11 @@ class AdminPanel {
       }
       
       if(window.StorageService) {
-        window.StorageService.saveLessonAs(title, (success) => {
+        window.StorageService.saveLesson(title, (success, entry, isNew) => {
           if(success) {
-            this.inputTitle.value = '';
             this.refreshList();
-            alert(window.I18n ? window.I18n.t('lib_save_success') : "Aula salva com sucesso na Biblioteca!");
+            const msg = isNew ? "Aula salva com sucesso na Biblioteca!" : "Aula atualizada com sucesso!";
+            alert(window.I18n ? window.I18n.t('lib_save_success') : msg);
           } else {
             alert(window.I18n ? window.I18n.t('lib_save_error') : "Erro ao salvar aula.");
           }
