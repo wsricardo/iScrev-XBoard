@@ -96,3 +96,67 @@
 .admin-action-btn:hover {
   opacity: 0.8;
 }
+
+/* Modais de Administração - Biblioteca */
+.save-section {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 25px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-input {
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  outline: none;
+  font-size: 1rem;
+  user-select: auto !important; /* CORRIGE O BUG DO INPUT BLOQUEADO */
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.admin-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-input:focus {
+  border-color: #7aa2f7;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 10px rgba(122, 162, 247, 0.3);
+}
+
+.admin-btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease;
+  user-select: none;
+}
+
+.admin-btn-primary {
+  background: #7aa2f7;
+}
+
+.admin-btn-primary:hover {
+  background: #3b4261;
+  box-shadow: 0 0 10px rgba(122, 162, 247, 0.5);
+}
+
+.admin-btn-secondary {
+  background: #6c757d;
+}
+
+.admin-btn-secondary:hover {
+  background: #5a6268;
+}

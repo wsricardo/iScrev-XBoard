@@ -114,10 +114,10 @@
     </header>
     <div id="admin-content" style="padding: 20px;">
       
-      <div class="save-section" style="margin-bottom: 30px; display: flex; gap: 10px;">
-        <button id="btn-new-lesson" style="padding: 10px 20px; border-radius: 8px; border: none; background: #6c757d; color: white; cursor: pointer; font-weight: bold;" data-i18n="lib_btn_new">📄 Nova Aula</button>
-        <input type="text" id="lesson-title-input" placeholder="Nome da aula atual..." style="flex: 1; padding: 10px; border-radius: 8px; border: none; outline: none; font-size: 1rem;">
-        <button id="btn-save-lesson" style="padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent-color); color: white; cursor: pointer; font-weight: bold;" data-i18n="lib_btn_save">💾 Salvar Lousa Atual</button>
+      <div class="save-section">
+        <button id="btn-new-lesson" class="admin-btn admin-btn-secondary" data-i18n="lib_btn_new">📄 Nova Aula</button>
+        <input type="text" id="lesson-title-input" class="admin-input" placeholder="Nome da aula atual..." data-i18n-title="lib_save_prompt">
+        <button id="btn-save-lesson" class="admin-btn admin-btn-primary" data-i18n="lib_btn_save">💾 Salvar Lousa Atual</button>
       </div>
 
       <h4>Aulas Salvas</h4>
