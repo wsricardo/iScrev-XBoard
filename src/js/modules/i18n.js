@@ -41,6 +41,7 @@ class I18n {
         // Dialog Biblioteca
         'lib_title': '📚 Biblioteca de Aulas',
         'lib_empty': 'Sua biblioteca está vazia.',
+        'lib_btn_new': '📄 Nova Aula',
         'lib_btn_save': '💾 Salvar Lousa Atual',
         'lib_save_prompt': 'Digite um título para salvar a lousa:',
         'lib_save_err': 'O título é obrigatório.',
@@ -54,6 +55,7 @@ class I18n {
         'lib_save_success': 'Aula salva com sucesso na Biblioteca!',
         'lib_save_error': 'Erro ao salvar aula.',
         'lib_confirm_load': 'Deseja realmente carregar esta aula? O quadro atual não salvo será perdido!',
+        'lib_confirm_new': 'Deseja criar uma nova aula em branco? Qualquer alteração não salva na atual será perdida!',
         'lib_load_error': 'Erro ao carregar a aula.',
         'lib_pdf_err': 'Módulo PDF não está carregado.',
         
@@ -102,6 +104,7 @@ class I18n {
         // Dialog Biblioteca
         'lib_title': '📚 Lessons Library',
         'lib_empty': 'Your library is empty.',
+        'lib_btn_new': '📄 New Lesson',
         'lib_btn_save': '💾 Save Current Board',
         'lib_save_prompt': 'Enter a title to save the board:',
         'lib_save_err': 'Title is required.',
@@ -115,6 +118,7 @@ class I18n {
         'lib_save_success': 'Lesson successfully saved to the Library!',
         'lib_save_error': 'Error saving lesson.',
         'lib_confirm_load': 'Do you really want to load this lesson? The current unsaved board will be lost!',
+        'lib_confirm_new': 'Do you want to create a new blank lesson? Any unsaved changes in the current one will be lost!',
         'lib_load_error': 'Error loading the lesson.',
         'lib_pdf_err': 'PDF Module is not loaded.',
         

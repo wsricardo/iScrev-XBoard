@@ -7,6 +7,7 @@ class AdminPanel {
     this.btnClose = document.getElementById('btn-close-admin');
     
     this.inputTitle = document.getElementById('lesson-title-input');
+    this.btnNew = document.getElementById('btn-new-lesson');
     this.btnSave = document.getElementById('btn-save-lesson');
     this.lessonsList = document.getElementById('lessons-list');
 
@@ -22,6 +23,21 @@ class AdminPanel {
     this.btnClose.addEventListener('click', () => {
       this.dialog.close();
     });
+
+    if(this.btnNew) {
+      this.btnNew.addEventListener('click', () => {
+        const msg = window.I18n ? window.I18n.t('lib_confirm_new') : "Deseja criar uma nova aula em branco? Qualquer alteração não salva na atual será perdida!";
+        if(confirm(msg)) {
+          this.inputTitle.value = '';
+          if(window.HistoryManager) {
+            window.HistoryManager.boards = [{ id: Date.now(), strokes: [], redoStack: [], bg: { type: 'solid', color: '#1e1e1e' } }];
+            window.HistoryManager.currentIndex = 0;
+            window.HistoryManager.changeBoard();
+          }
+          this.dialog.close();
+        }
+      });
+    }
 
     this.btnSave.addEventListener('click', () => {
       const title = this.inputTitle.value.trim();
