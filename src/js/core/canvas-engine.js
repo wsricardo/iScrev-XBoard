@@ -42,11 +42,21 @@ class CanvasEngine {
   }
 
   resize() {
+    // Evita redimensionamentos destrutivos se for apenas a subida do teclado virtual (mudança < 25% na altura e mesma largura)
+    const currentWidth = this.canvas.width;
+    const currentHeight = this.canvas.height;
+    
+    // Na inicialização as dimensoes sao 300x150, se for 300 ignora a trava
+    if (currentWidth !== 300 && currentWidth === window.innerWidth && window.innerHeight < currentHeight && (currentHeight - window.innerHeight) < (currentHeight * 0.35)) {
+      // Ignorar resize de teclado
+      return;
+    }
+
     // Salva o conteudo atual
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = this.canvas.width;
-    tempCanvas.height = this.canvas.height;
-    if(this.canvas.width > 0 && this.canvas.height > 0) {
+    tempCanvas.width = currentWidth;
+    tempCanvas.height = currentHeight;
+    if(currentWidth > 0 && currentHeight > 0) {
       tempCanvas.getContext('2d').drawImage(this.canvas, 0, 0);
     }
 
@@ -111,9 +121,15 @@ class CanvasEngine {
   onPointerMove(e) {
     if (!this.isDrawing) return;
 
-    const pressure = e.pressure || 0.5;
     const x = e.clientX;
     const y = e.clientY;
+
+    // OTIMIZACAO MOBILE: Filtro de distancia (> 2 pixels) para evitar estourar a memória
+    const dx = x - this.lastX;
+    const dy = y - this.lastY;
+    if (dx * dx + dy * dy < 4) return;
+
+    const pressure = e.pressure || 0.5;
 
     // Calculando o ponto médio para suavização Bezier Quadrática
     const midX = this.lastX + (x - this.lastX) / 2;

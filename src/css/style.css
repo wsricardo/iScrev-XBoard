@@ -22,6 +22,8 @@ body, html {
   color: var(--text-color);
   /* Impede selecao de texto acidental ao desenhar */
   user-select: none;
+  /* OTIMIZACAO MOBILE: Blinda comportamento de pull-to-refresh */
+  overscroll-behavior-y: none;
 }
 
 #main-canvas {
@@ -36,7 +38,7 @@ body, html {
 /* Toolbar Style - Glassmorphism */
 #toolbar {
   position: fixed;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -49,6 +51,7 @@ body, html {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
+  touch-action: none; /* Previne scroll no menu flutuante em mobile */
   transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
@@ -198,7 +201,7 @@ body, html {
     width: auto;
     max-height: 80vh;
     overflow-y: auto;
-    bottom: 80px; /* Eleva o menu para nao cobrir a parte inferior */
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* Eleva o menu para nao cobrir a parte inferior */
   }
 
   #toolbar.menu-expanded .tool-group {
@@ -231,12 +234,12 @@ body, html {
 @media (max-width: 480px) {
   #toolbar {
     padding: 8px 12px;
-    bottom: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
   
   #toolbar.menu-expanded {
     padding: 15px;
-    bottom: 60px;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     width: 95vw;
   }
 
