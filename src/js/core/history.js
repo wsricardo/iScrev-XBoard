@@ -61,9 +61,34 @@ class History {
   }
 
   addBoard() {
-    this.boards.push({ id: Date.now(), strokes: [], redoStack: [], bg: { type: 'solid', color: '#1e1e1e' } });
+    const bg = this.currentBoard.bg;
+
+    this.boards.push({
+      id: Date.now(), strokes: [], redoStack: [],
+      bg: { type: bg.type, color: bg.color }
+    });
+
     this.currentIndex = this.boards.length - 1;
     this.changeBoard();
+  }
+
+  removeBoard() {
+
+    if (this.boards.length > 1) {
+      this.boards.splice(this.currentIndex, 1);
+
+      if (this.currentIndex === 0 && this.boards.length > 1) {
+        this.currentIndex++;
+
+      } else if (this.boards.length <= 1) {
+        this.currentIndex = 0;
+
+      } else {
+        this.currentIndex--;
+      }
+
+      this.changeBoard();
+    }
   }
 
   nextBoard() {
@@ -87,22 +112,22 @@ class History {
     window.Engine.setBgColor(this.currentBoard.bg);
     this.redraw();
     this.saveToStorage();
-    
+
     // Atualiza a UI para refletir a nova prancheta e o fundo
-    if(window.UIManager) {
+    if (window.UIManager) {
       window.UIManager.updateBoardCounter(this.currentIndex + 1, this.boards.length);
       window.UIManager.updateBgColor(this.currentBoard.bg);
     }
   }
 
   redraw() {
-    if(window.Engine) {
+    if (window.Engine) {
       window.Engine.redrawHistory(this.currentBoard.strokes);
     }
   }
 
   saveToStorage() {
-    if(window.StorageService) {
+    if (window.StorageService) {
       clearTimeout(this.saveTimer);
       this.saveTimer = setTimeout(() => {
         window.StorageService.saveSession({
@@ -117,7 +142,7 @@ class History {
     if (data && data.boards) {
       this.boards = data.boards;
       this.currentIndex = data.currentIndex || 0;
-      
+
       // Limpa os redoStacks pois eles nao costumam ser vitais persistir, 
       // ou se foram salvos, mantemos
       this.changeBoard();

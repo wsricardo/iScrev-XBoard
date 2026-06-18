@@ -6,13 +6,13 @@ class UIManager {
     this.btnEraser = document.getElementById('btn-eraser');
     this.colorPicker = document.getElementById('color-picker');
     this.sizePicker = document.getElementById('size-picker');
-    
+
     this.btnBg = document.getElementById('btn-bg');
     this.bgDialog = document.getElementById('bg-dialog');
     this.btnCloseBg = document.getElementById('btn-close-bg');
     this.bgCards = document.querySelectorAll('.bg-card');
     this.customBgColor = document.getElementById('custom-bg-color');
-    
+
     // Idioma
     this.btnLang = document.getElementById('btn-lang');
     this.langDialog = document.getElementById('lang-dialog');
@@ -25,7 +25,7 @@ class UIManager {
     this.btnUndo = document.getElementById('btn-undo');
     this.btnRedo = document.getElementById('btn-redo');
     this.btnClear = document.getElementById('btn-clear');
-
+    this.btnRemoveBoard = document.getElementById('btn-remove-board');
     this.btnPrevBoard = document.getElementById('btn-prev-board');
     this.btnNextBoard = document.getElementById('btn-next-board');
     this.boardCounter = document.getElementById('board-counter');
@@ -74,7 +74,7 @@ class UIManager {
     this.bgCards.forEach(card => {
       card.addEventListener('click', (e) => {
         // Se clicar no input de cor dentro do card "custom", não fecha o card
-        if(e.target.tagName.toLowerCase() === 'input') return;
+        if (e.target.tagName.toLowerCase() === 'input') return;
 
         const type = card.getAttribute('data-type');
         let color = card.getAttribute('data-color') || '#1e1e1e';
@@ -83,17 +83,17 @@ class UIManager {
           color = this.customBgColor.value;
         }
 
-        if(window.HistoryManager) {
+        if (window.HistoryManager) {
           window.HistoryManager.setBg({ type, color });
         }
-        
+
         this.bgDialog.close();
       });
     });
 
     // Se o usuario trocar a cor customizada pelo input, aplica tambem
     this.customBgColor.addEventListener('change', (e) => {
-      if(window.HistoryManager) {
+      if (window.HistoryManager) {
         window.HistoryManager.setBg({ type: 'solid', color: e.target.value });
       }
     });
@@ -110,33 +110,40 @@ class UIManager {
     this.langCards.forEach(card => {
       card.addEventListener('click', () => {
         const lang = card.getAttribute('data-lang');
-        if(window.I18n) window.I18n.setLang(lang);
+        if (window.I18n) window.I18n.setLang(lang);
         this.langDialog.close();
       });
     });
 
     // Undo/Redo/Clear
     this.btnUndo.addEventListener('click', () => {
-      if(window.HistoryManager) window.HistoryManager.undo();
+      if (window.HistoryManager) window.HistoryManager.undo();
     });
 
     this.btnRedo.addEventListener('click', () => {
-      if(window.HistoryManager) window.HistoryManager.redo();
+      if (window.HistoryManager) window.HistoryManager.redo();
     });
+
     this.btnClear.addEventListener('click', () => {
       const msg = window.I18n ? window.I18n.t('confirm_clear') : 'Limpar toda a lousa?';
-      if(confirm(msg)) {
-        if(window.HistoryManager) window.HistoryManager.clearAll();
+      if (confirm(msg)) {
+        if (window.HistoryManager) window.HistoryManager.clearAll();
       }
     });
 
+    // Remove Board
+    this.btnRemoveBoard.addEventListener('click', () => {
+      if (window.HistoryManager) window.HistoryManager.removeBoard();
+    });
+
+
     // Multiquadros
     this.btnPrevBoard.addEventListener('click', () => {
-      if(window.HistoryManager) window.HistoryManager.prevBoard();
+      if (window.HistoryManager) window.HistoryManager.prevBoard();
     });
 
     this.btnNextBoard.addEventListener('click', () => {
-      if(window.HistoryManager) window.HistoryManager.nextBoard();
+      if (window.HistoryManager) window.HistoryManager.nextBoard();
     });
 
     // UI Ocultar Menu
@@ -151,11 +158,11 @@ class UIManager {
     });
 
     // Hamburger Mobile
-    if(this.btnHamburger) {
+    if (this.btnHamburger) {
       this.btnHamburger.addEventListener('click', () => {
         this.toolbar.classList.toggle('menu-expanded');
       });
-      
+
       // Recolhe menu mobile ao tocar na lousa
       document.getElementById('main-canvas').addEventListener('pointerdown', () => {
         this.toolbar.classList.remove('menu-expanded');
@@ -178,7 +185,7 @@ class UIManager {
 
   // Métodos expostos para outras classes atualizarem a UI
   updateBoardCounter(current, total) {
-    if(this.boardCounter) {
+    if (this.boardCounter) {
       this.boardCounter.innerText = `${current}/${total}`;
     }
   }

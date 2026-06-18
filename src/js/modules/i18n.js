@@ -3,13 +3,14 @@
 class I18n {
   constructor() {
     this.currentLang = localStorage.getItem('iScrev_lang') || 'pt-BR';
-    
+
     this.dictionary = {
       'pt-BR': {
         // Toolbar
         'tool_pen': 'Caneta',
         'tool_eraser': 'Borracha',
         'tool_clear': 'Limpar Lousa',
+        'tool_remove': 'Remover Quadro',
         'tool_undo': 'Desfazer',
         'tool_redo': 'Refazer',
         'tool_bg': 'Configurar Fundo',
@@ -37,7 +38,7 @@ class I18n {
         'media_desc': 'Abra um arquivo PDF do seu computador para ser lido no motor nativo offline.',
         'media_btn_open': '📁 Escolher Arquivo PDF',
         'media_reading': 'Lendo: ',
-        
+
         // Dialog Biblioteca
         'lib_title': '📚 Biblioteca de Aulas',
         'lib_empty': 'Sua biblioteca está vazia.',
@@ -58,13 +59,13 @@ class I18n {
         'lib_confirm_new': 'Deseja criar uma nova aula em branco? Qualquer alteração não salva na atual será perdida!',
         'lib_load_error': 'Erro ao carregar a aula.',
         'lib_pdf_err': 'Módulo PDF não está carregado.',
-        
+
         // Recorder
         'record_err': 'Não foi possível iniciar a gravação. Verifique as permissões de tela e microfone.',
 
         // Dialog de Idiomas
         'lang_title': '🌐 Selecione o Idioma / Select Language',
-        
+
         // Misc
         'confirm_clear': 'Limpar toda a lousa?'
       },
@@ -73,6 +74,7 @@ class I18n {
         'tool_pen': 'Pen',
         'tool_eraser': 'Eraser',
         'tool_clear': 'Clear Board',
+        'tool_remove': 'Remove Board',
         'tool_undo': 'Undo',
         'tool_redo': 'Redo',
         'tool_bg': 'Background Config',
@@ -100,7 +102,7 @@ class I18n {
         'media_desc': 'Open a local PDF file to read using the offline native engine.',
         'media_btn_open': '📁 Choose PDF File',
         'media_reading': 'Reading: ',
-        
+
         // Dialog Biblioteca
         'lib_title': '📚 Lessons Library',
         'lib_empty': 'Your library is empty.',
@@ -121,13 +123,13 @@ class I18n {
         'lib_confirm_new': 'Do you want to create a new blank lesson? Any unsaved changes in the current one will be lost!',
         'lib_load_error': 'Error loading the lesson.',
         'lib_pdf_err': 'PDF Module is not loaded.',
-        
+
         // Recorder
         'record_err': 'Could not start recording. Please check screen and microphone permissions.',
 
         // Dialog de Idiomas
         'lang_title': '🌐 Select Language',
-        
+
         // Misc
         'confirm_clear': 'Clear the entire board?'
       }
@@ -137,7 +139,7 @@ class I18n {
   }
 
   setLang(lang) {
-    if(this.dictionary[lang]) {
+    if (this.dictionary[lang]) {
       this.currentLang = lang;
       localStorage.setItem('iScrev_lang', lang);
       this.translateDOM();

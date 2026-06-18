@@ -1,6 +1,6 @@
 {
   "name": "iscrev-xboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lousa Digital Interativa (PWA & Desktop)",
   "repository": {
     "type": "git",
@@ -20,7 +20,10 @@
       "output": "dist"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "src/icons/icon.ico"
     },
     "nsis": {

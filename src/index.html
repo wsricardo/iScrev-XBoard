@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>iScrev XBoard</title>
-  
+
   <script>
     // Força a barra no final da URL para evitar que caminhos relativos quebrem
     if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
@@ -16,6 +17,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/modals.css">
 </head>
+
 <body>
   <!-- Área de Desenho -->
   <canvas id="main-canvas"></canvas>
@@ -29,7 +31,7 @@
       <button class="tool-btn active" id="btn-pen" data-i18n-title="tool_pen">✏️</button>
       <button class="tool-btn" id="btn-eraser" data-i18n-title="tool_eraser">🧼</button>
     </div>
-    
+
     <div class="tool-group">
       <input type="color" id="color-picker" value="#ffffff" title="Cor">
       <input type="range" id="size-picker" min="1" max="50" value="4" title="Espessura">
@@ -49,6 +51,7 @@
       <button class="tool-btn" id="btn-undo" data-i18n-title="tool_undo">↩️</button>
       <button class="tool-btn" id="btn-redo" data-i18n-title="tool_redo">↪️</button>
       <button class="tool-btn" id="btn-clear" data-i18n-title="tool_clear">🗑️</button>
+      <button class="tool-btn" id="btn-remove-board" data-i18n-title="tool_remove">❌</button>
     </div>
 
     <div class="tool-group mobile-hide">
@@ -68,10 +71,12 @@
     <div class="tool-group mobile-only" style="border-right: none; padding-right: 0;">
       <button class="tool-btn" id="btn-hamburger" data-i18n-title="tool_menu">☰</button>
     </div>
-    
+
     <!-- Botão Dinâmico PWA -->
     <div class="tool-group" style="border-right: none;">
-      <button class="tool-btn hidden" id="btn-install" data-i18n-title="tool_install" style="display: none; background: #28a745; box-shadow: 0 0 10px rgba(40,167,69,0.6);" title="Instalar App">📲</button>
+      <button class="tool-btn hidden" id="btn-install" data-i18n-title="tool_install"
+        style="display: none; background: #28a745; box-shadow: 0 0 10px rgba(40,167,69,0.6);"
+        title="Instalar App">📲</button>
     </div>
   </nav>
 
@@ -82,11 +87,13 @@
       <button id="btn-close-lang" class="close-btn">✖</button>
     </header>
     <div id="lang-content" style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-      <div class="bg-card lang-card" data-lang="pt-BR" style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
+      <div class="bg-card lang-card" data-lang="pt-BR"
+        style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
         <span style="font-size: 3rem;">🇧🇷</span>
         <span style="font-weight: bold; font-size: 1.1rem; color: #fff; margin-top: 10px;">Português</span>
       </div>
-      <div class="bg-card lang-card" data-lang="en" style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
+      <div class="bg-card lang-card" data-lang="en"
+        style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
         <span style="font-size: 3rem;">🇺🇸</span>
         <span style="font-weight: bold; font-size: 1.1rem; color: #fff; margin-top: 10px;">English</span>
       </div>
@@ -98,7 +105,8 @@
     <header class="dialog-header">
       <h3 id="dialog-title" data-i18n="media_title">Visualizador</h3>
       <div style="display: flex; gap: 10px;">
-        <button id="btn-minimize-dialog" class="close-btn" style="color: #ffc107;" data-i18n-title="media_minimize">➖</button>
+        <button id="btn-minimize-dialog" class="close-btn" style="color: #ffc107;"
+          data-i18n-title="media_minimize">➖</button>
         <button id="btn-close-dialog" class="close-btn" data-i18n-title="media_close">✖</button>
       </div>
     </header>
@@ -113,17 +121,20 @@
       <button id="btn-close-admin" class="close-btn">✖</button>
     </header>
     <div id="admin-content" style="padding: 20px;">
-      
+
       <div class="save-section">
         <button id="btn-new-lesson" class="admin-btn admin-btn-secondary" data-i18n="lib_btn_new">📄 Nova Aula</button>
-        <input type="text" id="lesson-title-input" class="admin-input" placeholder="Nome da aula atual..." data-i18n-title="lib_save_prompt">
-        <button id="btn-save-lesson" class="admin-btn admin-btn-primary" data-i18n="lib_btn_save">💾 Salvar Lousa Atual</button>
+        <input type="text" id="lesson-title-input" class="admin-input" placeholder="Nome da aula atual..."
+          data-i18n-title="lib_save_prompt">
+        <button id="btn-save-lesson" class="admin-btn admin-btn-primary" data-i18n="lib_btn_save">💾 Salvar Lousa
+          Atual</button>
       </div>
 
       <h4>Aulas Salvas</h4>
-      <div id="lessons-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+      <div id="lessons-list"
+        style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 10px;">
       </div>
-      
+
     </div>
   </dialog>
 
@@ -134,21 +145,30 @@
       <button id="btn-close-bg" class="close-btn">✖</button>
     </header>
     <div id="bg-content" style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-      
-      <div class="bg-card" data-type="solid" data-color="#1e1e1e" style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
+
+      <div class="bg-card" data-type="solid" data-color="#1e1e1e"
+        style="background: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
         <span style="font-weight: bold; font-size: 1.1rem; color: #fff;" data-i18n="bg_solid">Lousa Preta</span>
       </div>
 
-      <div class="bg-card" data-type="lines" data-color="#1e1e1e" style="background: repeating-linear-gradient(#1e1e1e, #1e1e1e 39px, rgba(255,255,255,0.15) 39px, rgba(255,255,255,0.15) 40px); border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
-        <span style="font-weight: bold; font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;" data-i18n="bg_lines">Caderno</span>
+      <div class="bg-card" data-type="lines" data-color="#1e1e1e"
+        style="background: repeating-linear-gradient(#1e1e1e, #1e1e1e 39px, rgba(255,255,255,0.15) 39px, rgba(255,255,255,0.15) 40px); border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
+        <span
+          style="font-weight: bold; font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;"
+          data-i18n="bg_lines">Caderno</span>
       </div>
 
-      <div class="bg-card" data-type="grid" data-color="#1e1e1e" style="background: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px; background-color: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
-        <span style="font-weight: bold; font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;" data-i18n="bg_grid">Quadriculado</span>
+      <div class="bg-card" data-type="grid" data-color="#1e1e1e"
+        style="background: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px; background-color: #1e1e1e; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 120px;">
+        <span
+          style="font-weight: bold; font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;"
+          data-i18n="bg_grid">Quadriculado</span>
       </div>
 
-      <div class="bg-card" data-type="custom" style="background: #333; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
-        <span style="font-weight: bold; font-size: 1.1rem; color: #fff; margin-bottom: 10px;" data-i18n="bg_custom">Cor Sólida (Livre)</span>
+      <div class="bg-card" data-type="custom"
+        style="background: #333; border: 2px solid #555; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
+        <span style="font-weight: bold; font-size: 1.1rem; color: #fff; margin-bottom: 10px;" data-i18n="bg_custom">Cor
+          Sólida (Livre)</span>
         <input type="color" id="custom-bg-color" value="#ffffff" style="width: 50px; height: 30px;">
       </div>
 
@@ -171,4 +191,5 @@
   <script src="js/modules/admin-panel.js"></script>
   <script src="js/modules/pwa-manager.js"></script>
 </body>
+
 </html>
