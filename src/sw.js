@@ -1,4 +1,4 @@
-const CACHE_NAME = 'xboard-cache-v2';
+const CACHE_NAME = 'xboard-cache-v2.1';
 const urlsToCache = [
   './index.html',
   './css/style.css',
@@ -24,7 +24,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => {
       return Promise.all(
         keys.filter(key => key.startsWith('xboard-cache-') && key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+          .map(key => caches.delete(key))
       );
     }).then(() => self.clients.claim())
   );

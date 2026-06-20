@@ -14,6 +14,10 @@ class CanvasEngine {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d', { desynchronized: true });
     
+    // Configura o canvas de fundo
+    this.bgCanvas = document.getElementById('bg-canvas');
+    this.bgCtx = this.bgCanvas ? this.bgCanvas.getContext('2d', { alpha: false }) : null;
+
     this.isDrawing = false;
     this.currentTool = 'pen'; // 'pen' | 'eraser'
     this.currentColor = '#ffffff';
@@ -36,8 +40,12 @@ class CanvasEngine {
 
   initCanvas() {
     this.resize();
-    if(window.BackgroundManager) {
-      window.BackgroundManager.render(this.ctx, this.canvas.width, this.canvas.height, this.backgroundColor);
+    this.drawBackground();
+  }
+  
+  drawBackground() {
+    if (this.bgCtx && window.BackgroundManager) {
+      window.BackgroundManager.render(this.bgCtx, this.bgCanvas.width, this.bgCanvas.height, this.backgroundColor);
     }
   }
 
@@ -52,7 +60,7 @@ class CanvasEngine {
       return;
     }
 
-    // Salva o conteudo atual
+    // Salva o conteudo atual (apenas tracos)
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = currentWidth;
     tempCanvas.height = currentHeight;
@@ -63,11 +71,15 @@ class CanvasEngine {
     // Ajusta resolucao real
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+    
+    if (this.bgCanvas) {
+      this.bgCanvas.width = window.innerWidth;
+      this.bgCanvas.height = window.innerHeight;
+    }
 
     // Restaura o conteudo
-    if(window.BackgroundManager) {
-      window.BackgroundManager.render(this.ctx, this.canvas.width, this.canvas.height, this.backgroundColor);
-    }
+    this.drawBackground();
+    
     if(tempCanvas.width > 0 && tempCanvas.height > 0) {
       this.ctx.drawImage(tempCanvas, 0, 0);
     }
@@ -190,9 +202,8 @@ class CanvasEngine {
   }
 
   clear() {
-    if(window.BackgroundManager) {
-      window.BackgroundManager.render(this.ctx, this.canvas.width, this.canvas.height, this.backgroundColor);
-    }
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawBackground();
   }
 
   redrawHistory(strokes) {

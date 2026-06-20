@@ -26,13 +26,25 @@ body, html {
   overscroll-behavior-y: none;
 }
 
-#main-canvas {
+#bg-canvas, #main-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
   width: 100vw;
   height: 100vh;
-  cursor: crosshair;
-  background-color: #1e1e1e;
   touch-action: none; /* ESSENCIAL: Impede o navegador de rolar a pagina ao desenhar */
+}
+
+#bg-canvas {
+  z-index: 1;
+  background-color: #1e1e1e;
+}
+
+#main-canvas {
+  z-index: 2;
+  cursor: crosshair;
+  background-color: transparent; /* Permite que o bg-canvas seja visto */
 }
 
 /* Toolbar Style - Glassmorphism */
@@ -52,7 +64,13 @@ body, html {
   border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
   touch-action: none; /* Previne scroll no menu flutuante em mobile */
-  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), border-radius 0.3s, bottom 0.3s, padding 0.3s;
+}
+
+.secondary-tools {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .toolbar-hidden {
@@ -193,15 +211,37 @@ body, html {
   }
 
   /* Gaveta Flutuante para Mobile */
+  #toolbar {
+    flex-wrap: nowrap;
+    width: auto;
+    border-radius: 50px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+  }
+
+  .secondary-tools {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
   #toolbar.menu-expanded {
     flex-direction: column;
     align-items: center;
-    border-radius: 16px;
+    border-radius: 24px;
     padding: 20px;
-    width: auto;
+    width: 90vw;
     max-height: 80vh;
     overflow-y: auto;
-    bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* Eleva o menu para nao cobrir a parte inferior */
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #toolbar.menu-expanded .secondary-tools {
+    display: flex;
+    margin-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
   }
 
   #toolbar.menu-expanded .tool-group {
@@ -221,10 +261,6 @@ body, html {
     padding-bottom: 0;
   }
 
-  #toolbar.menu-expanded .mobile-hide {
-    display: flex !important;
-  }
-
   /* Ajustes no seletor de range para não esmagar no mobile */
   #size-picker {
     width: 100px;
@@ -233,13 +269,13 @@ body, html {
 
 @media (max-width: 480px) {
   #toolbar {
-    padding: 8px 12px;
+    padding: 8px 16px;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
   
   #toolbar.menu-expanded {
     padding: 15px;
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     width: 95vw;
   }
 
