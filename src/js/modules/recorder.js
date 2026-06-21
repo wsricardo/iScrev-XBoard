@@ -116,6 +116,9 @@ class Recorder {
         this.mergeCanvas.height = mainCanvas.height;
       }
 
+      // LIMPEZA CRÍTICA: Apaga o quadro anterior para evitar sobreposição (ghosting) de páginas velhas
+      this.mergeCtx.clearRect(0, 0, this.mergeCanvas.width, this.mergeCanvas.height);
+
       // Mescla as camadas fundo e topo
       this.mergeCtx.drawImage(bgCanvas, 0, 0);
       this.mergeCtx.drawImage(mainCanvas, 0, 0);
