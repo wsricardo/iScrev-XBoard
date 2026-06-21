@@ -10,7 +10,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false, // Segurança: isola o DOM do Node
-      contextIsolation: true
+      contextIsolation: true,
+      webviewTag: true // Habilita webviews para rodar YouTube isolado do file://
     }
   });
 

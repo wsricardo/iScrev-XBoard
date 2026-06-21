@@ -12,6 +12,7 @@ class MediaViewer {
     this.btnVideo = document.getElementById('btn-video');
 
     this.currentPdfUrl = null;
+    this.currentVideoUrl = null;
 
     this.bindEvents();
   }
@@ -29,11 +30,17 @@ class MediaViewer {
       });
     }
     
-    // Abrir YouTube
+    // Abrir Vídeo
     this.btnVideo.addEventListener('click', () => {
-      const url = prompt("Cole a URL do video do YouTube (embed):", "https://www.youtube.com/embed/dQw4w9WgXcQ");
-      if(url) {
-        this.openYouTube(url);
+      if (this.dialog.open) {
+        this.dialog.close();
+        return;
+      }
+      
+      if (this.currentVideoUrl) {
+        this.dialog.showModal();
+      } else {
+        this.showVideoMenu();
       }
     });
 
@@ -56,10 +63,50 @@ class MediaViewer {
     });
   }
 
-  openYouTube(url) {
-    this.title.innerText = "Vídeo";
-    this.content.innerHTML = `<iframe src="${url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  showVideoMenu() {
+    this.title.innerText = "Reprodutor de Vídeo";
+    
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/mp4,video/webm,video/ogg';
+    fileInput.style.display = 'none';
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        this.loadLocalVideo(file);
+      }
+    });
+
+    this.content.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ccc;">
+        <h2 style="margin-bottom: 20px;">Reprodutor Multimídia</h2>
+        <p style="margin-bottom: 30px; text-align: center;">Escolha um arquivo de vídeo do seu computador para assistir.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 350px;">
+          <button id="btn-trigger-video" style="padding: 15px 20px; font-size: 1.2rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+            📁 Abrir Vídeo Local (.mp4)
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.content.appendChild(fileInput);
+    
+    document.getElementById('btn-trigger-video').addEventListener('click', () => fileInput.click());
+
     this.dialog.showModal();
+  }
+
+  loadLocalVideo(file) {
+    if(this.currentVideoUrl && this.currentVideoUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.currentVideoUrl);
+    }
+    
+    this.currentVideoUrl = URL.createObjectURL(file);
+    
+    this.content.innerHTML = `<video src="${this.currentVideoUrl}" controls autoplay style="width: 100%; height: 100%; border-radius: 8px; background: black; outline: none;"></video>`;
+    this.title.innerText = `Assistindo: ${file.name}`;
   }
 
   showPdfMenu() {
@@ -130,6 +177,14 @@ class MediaViewer {
       URL.revokeObjectURL(this.currentPdfUrl);
       this.currentPdfUrl = null;
       this.btnPdf.classList.remove('has-pdf');
+    }
+
+    // Limpeza de Video
+    if(this.currentVideoUrl) {
+      if (this.currentVideoUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.currentVideoUrl);
+      }
+      this.currentVideoUrl = null;
     }
   }
 }
