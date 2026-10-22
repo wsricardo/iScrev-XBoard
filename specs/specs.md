@@ -1,73 +1,84 @@
-Excelente iniciativa. Utilizar a abordagem de Specs Driven Development (SDD) para uma aplicação como essa é a melhor forma de garantir que o projeto não se torne um monólito difícil de manter, especialmente ao dividir o app entre PWA e Desktop (Electron).
+# Especificações Técnicas: iScrev XBoard
 
-Para manter a leveza, a performance e a portabilidade que você busca, estruturar o frontend com Javascript puro (Vanilla JS), HTML5 e CSS3 é uma escolha muito sólida. O elemento `<canvas>` será o coração da sua lousa digital, permitindo um controle minucioso sobre o motor de renderização dos pincéis e da borracha.
+Este documento define a arquitetura, as tecnologias e os padrões de projeto (Specs) adotados no desenvolvimento do **iScrev XBoard**, uma lousa digital multiplataforma desenhada para aulas, apresentações e anotações de alta performance.
 
-Abaixo, detalho a arquitetura inicial e a expansão das suas especificações para começarmos a moldar o código.
+---
 
-### Arquitetura de Diretórios Proposta
+## 1. Visão Geral da Arquitetura
 
-O segredo para rodar o mesmo código no navegador (PWA) e no desktop (Electron) é isolar a lógica de negócio (o "Renderer") dos recursos específicos do sistema operacional (o "Main").
+O **iScrev XBoard** adota a abordagem *Specs Driven Development (SDD)* e foi construído para rodar de forma híbrida:
+1. **PWA (Progressive Web App):** Acesso universal via navegador, rodando offline através de Service Workers (`sw.js`).
+2. **Desktop App (Electron):** Encapsulamento nativo para Windows/Linux/Mac, permitindo captura de tela e microfone nativos sem prompts excessivos de segurança e isolando abas pesadas (`<webview>`).
+
+Para manter a máxima leveza e performance, o projeto descarta frameworks inchados (como React ou Angular) em favor de **Javascript puro (Vanilla JS - ES6)**, HTML5 e CSS3 moderno (com suporte a Glassmorphism). O `<canvas>` é o núcleo do motor gráfico.
+
+---
+
+## 2. Estrutura de Diretórios (Arquitetura)
+
+A separação de responsabilidades é rigorosa. O código que lida com o sistema operacional (Electron) é isolado da regra de negócios da Lousa (PWA Renderer).
 
 ```text
-/lousa-digital
-├── package.json
+/iScrev-XBoard
+├── package.json            # Scripts de build (npm run dev, build, build:web)
 ├── main.js                 # Ponto de entrada do Electron (Main Process)
-├── preload.js              # Ponte de segurança entre Main e Renderer (IPC)
-└── /src                    # PWA e Interface da Aplicação (Renderer)
+├── preload.js              # Ponte IPC segura entre Main e Renderer
+├── /docs                   # Documentações e relatórios adicionais
+├── /specs                  # Especificações técnicas e manuais de arquitetura
+└── /src                    # PWA e Interface da Aplicação (Renderer Frontend)
     ├── index.html
     ├── manifest.json       # Configuração do PWA
-    ├── sw.js               # Service Worker para PWA (cache e offline)
+    ├── sw.js               # Service Worker para PWA
     ├── /css
-    │   ├── style.css
-    │   └── modals.css
+    │   ├── style.css       # Estilos globais e da prancheta
+    │   └── ui.css          # Estilos de barra de ferramentas e modais
     ├── /js
-    │   ├── /core
-    │   │   ├── canvas-engine.js # Motor de desenho, pincéis, coordenadas
-    │   │   └── history.js       # Controle de Desfazer/Refazer (Undo/Redo)
-    │   ├── /modules
-    │   │   ├── ui-manager.js    # Controle de botões, paleta de cores e background
-    │   │   ├── media-viewer.js  # Lógica dos modais (YouTube, Vídeo local, PDF.js)
-    │   │   └── recorder.js      # MediaRecorder API para captura de áudio/tela
+    │   ├── /core           # Núcleo duro de performance e estado
+    │   │   ├── canvas-engine.js # Motor de desenho (Bézier, eventos de pointer)
+    │   │   └── history.js       # Paginação e controle de Undo/Redo
+    │   ├── /modules        # Funcionalidades satélites
+    │   │   ├── background-manager.js # Renderização de grades e linhas no fundo
+    │   │   ├── i18n.js               # Dicionário dinâmico de tradução (PT/EN)
+    │   │   ├── pdf-exporter.js       # Exportação da prancheta para PDF local
+    │   │   ├── recorder.js           # MediaRecorder nativo (Tela + Microfone)
+    │   │   └── ui-manager.js         # Escuta de eventos do DOM e desacoplamento
     │   └── /services
-    │       └── storage.js       # Integração com IndexedDB para salvar/abrir notas
-    └── /assets
-        ├── /icons
-        └── /textures        # Texturas de quadro negro, quadro branco, etc.
-
+    │       └── storage.js            # Driver IndexedDB para persistência de dados
+    └── /assets             # Ícones genéricos e recursos estáticos
 ```
 
 ---
 
-### Detalhamento dos Módulos (Especificações Técnicas)
+## 3. Detalhamento dos Módulos Principais
 
-#### 1. Core Engine (Lousa e Pincéis)
+A aplicação utiliza um padrão de **Classes Singleton**, acoplando instâncias únicas ao objeto global `window` após o evento de carga da página (`load`), o que simplifica injeções de dependência.
 
-* **Tecnologia:** HTML5 `<canvas>` e a API de contexto `2D`.
-* **Funcionamento:** Em vez de apenas salvar a imagem final, o ideal é capturar os eventos de ponteiro (`pointerdown`, `pointermove`, `pointerup` — que unificam mouse, toque e canetas stylus) e registrar as coordenadas.
-* **Motor de Pincel:** Crie uma classe modular para a ferramenta ativa. Isso permite trocar entre "Piloto", "Borracha" e futuros tipos de pincel facilmente. A borracha pode ser implementada utilizando `globalCompositeOperation = 'destination-out'` no canvas, o que "apaga" os pixels reais em vez de pintar de branco (útil se o fundo tiver textura).
+### 3.1. Core Engine Gráfico (`window.Engine`)
+- **Tecnologia:** HTML5 `<canvas>` com `desynchronized: true` para baixa latência.
+- **Mecânica:** Captura eventos unificados (`pointerdown`, `pointermove`, `pointerup`).
+- **Suavização:** Ao invés de traços retos, desenha dinamicamente Curvas Quadráticas de Bézier entre os pontos coletados, calibrando a espessura da linha baseando-se na pressão física da caneta (`e.pressure`).
 
-#### 2. Modais e Media Viewer (Vídeos e PDF)
+### 3.2. Gerenciamento de Estado (`window.HistoryManager`)
+- O aplicativo age como um caderno. Cada folha é um "Board".
+- Os estados não são salvos como pixels pesados, mas de forma **Vetorial**: coordenadas, pressões e cores, em memória (Arrays).
+- Permite paginação fluida e ferramentas precisas de `undo()` (desfazer) e `redo()` (refazer) localizadas para cada página.
 
-* **UI:** Utilize a tag nativa `<dialog>` do HTML5 para os modais. Ela abstrai a necessidade de gerenciar z-index e focos complexos.
-* **PDF:** A biblioteca `pdf.js` (da Mozilla) é o padrão ouro. Ela pode renderizar as páginas do PDF em um `<canvas>` secundário dentro do seu modal, mantendo o ambiente sem dependências excessivas de UI.
-* **Vídeos:** Para YouTube, um simples `<iframe>` embutido no modal. Para vídeos locais (`.mp4`), a tag `<video>` nativa.
+### 3.3. Banco de Dados e Persistência (`window.StorageService`)
+- **Tecnologia:** API nativa IndexedDB.
+- **Fluxo:** O XBoard salva a aula passivamente em background a cada 1 segundo (Debounce).
+- **Recursos:** Capacidade de serializar aulas (Projetos de lousa vetorial) para a "Biblioteca de Aulas" contendo inúmeras páginas.
 
-#### 3. Armazenamento (IndexedDB)
-
-* **Estratégia:** O IndexedDB salvará as "Sessões" de aula.
-* **O que salvar:** Você tem duas opções. A mais simples é salvar a lousa como uma string Base64 (`canvas.toDataURL()`). A mais avançada e recomendada para painéis interativos é salvar um array de objetos (os traços, coordenadas, cor e tamanho), serializados em JSON. Isso permite reabrir a nota e continuar apagando ou modificando elementos individuais no futuro.
-
-#### 4. Gravação de Tela e Áudio (Recorder)
-
-* **Tecnologia:** `MediaRecorder API` e `navigator.mediaDevices.getDisplayMedia()`.
-* **Isolamento:** Este módulo deve pedir permissão para capturar a tela (a própria janela do app) e o microfone do usuário. Os blocos de dados (`chunks`) gerados são agrupados em um `Blob` e transformados em um arquivo `.webm` ou `.mp4` para download no final da aula.
+### 3.4. Motor de Gravação Nativel (`window.RecorderModule`)
+- **Tecnologia:** `MediaRecorder API`, `<canvas>.captureStream(30)` e `getUserMedia`.
+- **Mecânica:** Combina um canvas de fundo com o canvas de escrita num terceiro "MergeCanvas" invisível, e une ao áudio do microfone do professor. Extrai vídeos universais no formato `.webm` direto no navegador.
 
 ---
 
-### Próximos Passos de Desenvolvimento
+## 4. Estilos e Responsividade
 
-1. **Setup Base:** Inicializar o projeto Node (`npm init`) e instalar o Electron (`npm install electron --save-dev`).
-2. **Janela do Electron:** Configurar o `main.js` para abrir o `src/index.html` sem as barras de menu padrão do SO, criando uma imersão de lousa em tela cheia.
-3. **Lógica do Canvas:** Construir o `canvas-engine.js` garantindo que o redimensionamento da janela atualize as coordenadas do `<canvas>` corretamente.
+O visual da aplicação prioriza a atenção ao centro da tela (a área de escrita). 
+Menus são colapsáveis (Toolbar, Drawer) e modais utilizam a tag `<dialog>` do HTML5, garantindo leveza do DOM e removendo a dependência de bibliotecas obscuras de manipulação de *z-index*.
 
-Para começarmos a escrever o código, qual módulo você prefere atacar primeiro: a configuração inicial do ambiente (Electron + PWA) ou a construção do motor do Canvas (desenho e pincéis)?
+## 5. Próximas Atualizações (Roadmap)
+- Refinamento das texturas de quadros.
+- Migração completa para TypeScript (opcional) caso a escalabilidade de módulos demande tipagem forte nas estruturas do IndexedDB.
