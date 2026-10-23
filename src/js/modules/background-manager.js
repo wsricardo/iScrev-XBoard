@@ -11,7 +11,7 @@ class BackgroundManager {
   render(ctx, width, height, bgConfig) {
     // Tratamento de retrocompatibilidade (aulas antigas salvas so como Hex string)
     let config = { type: 'solid', color: '#1e1e1e' };
-    
+
     if (typeof bgConfig === 'string') {
       config.color = bgConfig;
     } else if (bgConfig && typeof bgConfig === 'object') {
@@ -36,8 +36,8 @@ class BackgroundManager {
     ctx.beginPath();
     ctx.lineWidth = 1;
     // Usa uma cor sutil com transparencia baseada no tema escuro
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; 
-    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+
     for (let y = lineSpacing; y < height; y += lineSpacing) {
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
@@ -66,6 +66,8 @@ class BackgroundManager {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.BackgroundManager = new BackgroundManager();
-});
+});*/
+
+export { BackgroundManager };
