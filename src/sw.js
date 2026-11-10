@@ -1,14 +1,17 @@
-const CACHE_NAME = 'xboard-cache-v2.4';
+const CACHE_NAME = 'xboard-cache-v2.99.5';
 const urlsToCache = [
   './index.html',
   './css/style.css',
   './css/modals.css',
+  './js/libs/jspdf.umd.min.js',
   './js/core/canvas-engine.js',
   './js/core/history.js',
   './js/modules/ui-manager.js',
   './js/modules/media-viewer.js',
   './js/modules/recorder.js',
-  './js/services/storage.js'
+  './js/services/storage.js',
+  './js/modules/background-manager.js',
+  './js/app.js'
 ];
 
 self.addEventListener('install', event => {

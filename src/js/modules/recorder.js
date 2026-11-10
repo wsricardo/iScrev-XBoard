@@ -22,7 +22,7 @@ class Recorder {
     try {
       const mainCanvas = document.getElementById('main-canvas');
       const bgCanvas = document.getElementById('bg-canvas');
-      
+
       if (!mainCanvas || !bgCanvas) {
         throw new Error("Canvas não encontrados para gravação.");
       }
@@ -39,7 +39,7 @@ class Recorder {
 
       // Captura o stream de vídeo do canvas oculto a 30 FPS
       const displayStream = this.mergeCanvas.captureStream(30);
-      
+
       // Captura o microfone do professor
       const audioStream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -67,7 +67,7 @@ class Recorder {
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         options = { mimeType: 'video/webm' }; // Fallback universal
       }
-      
+
       this.mediaRecorder = new MediaRecorder(combinedStream, options);
       this.recordedChunks = [];
 
@@ -88,12 +88,12 @@ class Recorder {
       };
 
       this.mediaRecorder.start();
-      
+
       // Feedback visual na UI
       this.btnRecord.style.color = '#ff5c5c';
       this.btnRecord.innerText = '⏹️';
       this.btnRecord.title = 'Parar Gravação';
-      
+
     } catch (err) {
       this.isRecording = false;
       if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -132,11 +132,11 @@ class Recorder {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
-    
+
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       this.mediaRecorder.stop();
     }
-    
+
     this.btnRecord.style.color = 'white';
     this.btnRecord.innerText = '⏺️';
     this.btnRecord.title = window.I18n ? window.I18n.t('tool_record') : 'Gravar Aula';
@@ -155,6 +155,9 @@ class Recorder {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.RecorderModule = new Recorder();
 });
+*/
+
+export { Recorder };

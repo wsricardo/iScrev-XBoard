@@ -168,6 +168,8 @@ class I18n {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.I18n = new I18n();
-});
+});*/
+
+export { I18n };

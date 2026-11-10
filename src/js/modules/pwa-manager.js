@@ -15,7 +15,7 @@ class PWAManager {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredPrompt = e;
-      
+
       // Exibe o botão de instalar na interface se não estiver instalado
       if (this.btnInstall && !this.isStandalone) {
         this.btnInstall.classList.remove('hidden');
@@ -46,7 +46,7 @@ class PWAManager {
     if ('serviceWorker' in navigator) {
       // O registro agora eh feito aqui em vez de no index.html diretamente
       navigator.serviceWorker.register('./sw.js').then(registration => {
-        
+
         // Verifica atualizações silenciosas em background
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
@@ -70,6 +70,8 @@ class PWAManager {
 }
 
 // Inicia o módulo após o carregamento completo do DOM
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.PWAManager = new PWAManager();
-});
+});*/
+
+export { PWAManager };

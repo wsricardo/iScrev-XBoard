@@ -9,6 +9,7 @@ class BackgroundManager {
    * @param {Object|String} bgConfig Configuracao do fundo.
    */
   render(ctx, width, height, bgConfig) {
+    //console.log(' start render grid ', ctx)
     // Tratamento de retrocompatibilidade (aulas antigas salvas so como Hex string)
     let config = { type: 'solid', color: '#1e1e1e' };
 

@@ -3,7 +3,7 @@
 // Utilitário de debounce para evitar disparo excessivo de eventos
 function debounce(func, wait) {
   let timeout;
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
@@ -13,7 +13,7 @@ class CanvasEngine {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d', { desynchronized: true });
-    
+
     // Configura o canvas de fundo
     this.bgCanvas = document.getElementById('bg-canvas');
     this.bgCtx = this.bgCanvas ? this.bgCanvas.getContext('2d', { alpha: false }) : null;
@@ -22,7 +22,7 @@ class CanvasEngine {
     this.currentTool = 'pen'; // 'pen' | 'eraser'
     this.currentColor = '#ffffff';
     this.currentLineWidth = 4;
-    
+
     this.currentStroke = null;
     this.lastX = 0;
     this.lastY = 0;
@@ -30,10 +30,10 @@ class CanvasEngine {
     this.controlY = 0;
     this.lastPressure = 0.5;
     this.backgroundColor = { type: 'solid', color: '#1e1e1e' };
-    
+
     this.initCanvas();
     this.bindEvents();
-    
+
     // Resize otimizado com debounce (espera 200ms apos o usuario parar de redimensionar)
     window.addEventListener('resize', debounce(this.resize.bind(this), 200));
   }
@@ -42,7 +42,7 @@ class CanvasEngine {
     this.resize();
     this.drawBackground();
   }
-  
+
   drawBackground() {
     if (this.bgCtx && window.BackgroundManager) {
       window.BackgroundManager.render(this.bgCtx, this.bgCanvas.width, this.bgCanvas.height, this.backgroundColor);
@@ -53,7 +53,7 @@ class CanvasEngine {
     // Evita redimensionamentos destrutivos se for apenas a subida do teclado virtual (mudança < 25% na altura e mesma largura)
     const currentWidth = this.canvas.width;
     const currentHeight = this.canvas.height;
-    
+
     // Na inicialização as dimensoes sao 300x150, se for 300 ignora a trava
     if (currentWidth !== 300 && currentWidth === window.innerWidth && window.innerHeight < currentHeight && (currentHeight - window.innerHeight) < (currentHeight * 0.35)) {
       // Ignorar resize de teclado
@@ -64,14 +64,14 @@ class CanvasEngine {
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = currentWidth;
     tempCanvas.height = currentHeight;
-    if(currentWidth > 0 && currentHeight > 0) {
+    if (currentWidth > 0 && currentHeight > 0) {
       tempCanvas.getContext('2d').drawImage(this.canvas, 0, 0);
     }
 
     // Ajusta resolucao real
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    
+
     if (this.bgCanvas) {
       this.bgCanvas.width = window.innerWidth;
       this.bgCanvas.height = window.innerHeight;
@@ -79,8 +79,8 @@ class CanvasEngine {
 
     // Restaura o conteudo
     this.drawBackground();
-    
-    if(tempCanvas.width > 0 && tempCanvas.height > 0) {
+
+    if (tempCanvas.width > 0 && tempCanvas.height > 0) {
       this.ctx.drawImage(tempCanvas, 0, 0);
     }
   }
@@ -95,7 +95,7 @@ class CanvasEngine {
   setTool(tool) { this.currentTool = tool; }
   setColor(color) { this.currentColor = color; }
   setLineWidth(width) { this.currentLineWidth = width; }
-  
+
   setBgColor(color) {
     this.backgroundColor = color;
     // O redesenho eh disparado pelo history para garantir consistência
@@ -104,7 +104,7 @@ class CanvasEngine {
   onPointerDown(e) {
     this.isDrawing = true;
     this.canvas.setPointerCapture(e.pointerId);
-    
+
     const pressure = e.pressure || 0.5; // pressao padrao se o hardware nao suportar
     const x = e.clientX;
     const y = e.clientY;
@@ -167,7 +167,7 @@ class CanvasEngine {
 
   onPointerUp(e) {
     if (!this.isDrawing) return;
-    
+
     // Conclui o ultimo rabicho da curva ate a ponta solta da caneta
     this.ctx.beginPath();
     this.ctx.moveTo(this.controlX, this.controlY);
@@ -188,10 +188,10 @@ class CanvasEngine {
   applyContextStyles(pressure) {
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
-    
+
     // Pressao altera a espessura dinamicamente
     this.ctx.lineWidth = this.currentLineWidth * (pressure * 2);
-    
+
     if (this.currentTool === 'eraser') {
       this.ctx.globalCompositeOperation = 'destination-out';
       this.ctx.strokeStyle = 'rgba(0,0,0,1)';
@@ -208,17 +208,17 @@ class CanvasEngine {
 
   redrawHistory(strokes) {
     this.clear();
-    for(let stroke of strokes) {
-      if(!stroke || !stroke.points || stroke.points.length === 0) continue;
-      
+    for (let stroke of strokes) {
+      if (!stroke || !stroke.points || stroke.points.length === 0) continue;
+
       let p0 = stroke.points[0];
-      
+
       this.ctx.beginPath();
       this.ctx.moveTo(p0.x, p0.y);
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
       this.ctx.lineWidth = stroke.lineWidth * (p0.pressure * 2);
-      
+
       if (stroke.tool === 'eraser') {
         this.ctx.globalCompositeOperation = 'destination-out';
         this.ctx.strokeStyle = 'rgba(0,0,0,1)';
@@ -228,25 +228,25 @@ class CanvasEngine {
       }
       this.ctx.lineTo(p0.x, p0.y);
       this.ctx.stroke();
-      
+
       let lastX = p0.x;
       let lastY = p0.y;
       let ctrlX = p0.x;
       let ctrlY = p0.y;
 
-      for(let i=1; i<stroke.points.length; i++) {
+      for (let i = 1; i < stroke.points.length; i++) {
         const pt = stroke.points[i];
-        
+
         const midX = lastX + (pt.x - lastX) / 2;
         const midY = lastY + (pt.y - lastY) / 2;
-        
+
         this.ctx.beginPath();
         this.ctx.moveTo(ctrlX, ctrlY);
-        
+
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.lineWidth = stroke.lineWidth * (pt.pressure * 2);
-        
+
         if (stroke.tool === 'eraser') {
           this.ctx.globalCompositeOperation = 'destination-out';
           this.ctx.strokeStyle = 'rgba(0,0,0,1)';
@@ -257,13 +257,13 @@ class CanvasEngine {
 
         this.ctx.quadraticCurveTo(lastX, lastY, midX, midY);
         this.ctx.stroke();
-        
+
         ctrlX = midX;
         ctrlY = midY;
         lastX = pt.x;
         lastY = pt.y;
       }
-      
+
       // Conclui ultima ponta
       if (stroke.points.length > 1) {
         const lastPt = stroke.points[stroke.points.length - 1];
@@ -278,6 +278,8 @@ class CanvasEngine {
 }
 
 // Instancia global
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.Engine = new CanvasEngine('main-canvas');
-});
+});*/
+
+export { CanvasEngine };

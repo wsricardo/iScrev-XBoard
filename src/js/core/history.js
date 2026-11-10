@@ -150,6 +150,8 @@ class History {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.HistoryManager = new History();
-});
+});*/
+
+export { History };

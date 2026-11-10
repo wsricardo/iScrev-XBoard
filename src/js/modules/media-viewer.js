@@ -7,7 +7,7 @@ class MediaViewer {
     this.content = document.getElementById('dialog-content');
     this.btnClose = document.getElementById('btn-close-dialog');
     this.btnMinimize = document.getElementById('btn-minimize-dialog');
-    
+
     this.btnPdf = document.getElementById('btn-pdf');
     this.btnVideo = document.getElementById('btn-video');
 
@@ -29,14 +29,14 @@ class MediaViewer {
         this.dialog.close(); // Apenas esconde a janela
       });
     }
-    
+
     // Abrir Vídeo
     this.btnVideo.addEventListener('click', () => {
       if (this.dialog.open) {
         this.dialog.close();
         return;
       }
-      
+
       if (this.currentVideoUrl) {
         this.dialog.showModal();
       } else {
@@ -65,7 +65,7 @@ class MediaViewer {
 
   showVideoMenu() {
     this.title.innerText = "Reprodutor de Vídeo";
-    
+
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'video/mp4,video/webm,video/ogg';
@@ -73,7 +73,7 @@ class MediaViewer {
 
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if(file) {
+      if (file) {
         this.loadLocalVideo(file);
       }
     });
@@ -92,26 +92,26 @@ class MediaViewer {
     `;
 
     this.content.appendChild(fileInput);
-    
+
     document.getElementById('btn-trigger-video').addEventListener('click', () => fileInput.click());
 
     this.dialog.showModal();
   }
 
   loadLocalVideo(file) {
-    if(this.currentVideoUrl && this.currentVideoUrl.startsWith('blob:')) {
+    if (this.currentVideoUrl && this.currentVideoUrl.startsWith('blob:')) {
       URL.revokeObjectURL(this.currentVideoUrl);
     }
-    
+
     this.currentVideoUrl = URL.createObjectURL(file);
-    
+
     this.content.innerHTML = `<video src="${this.currentVideoUrl}" controls autoplay style="width: 100%; height: 100%; border-radius: 8px; background: black; outline: none;"></video>`;
     this.title.innerText = `Assistindo: ${file.name}`;
   }
 
   showPdfMenu() {
     this.title.innerText = window.I18n ? window.I18n.t('media_read_file') : "Visualizador PDF";
-    
+
     // Cria um input de arquivo escondido
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -121,7 +121,7 @@ class MediaViewer {
     // Ao escolher o arquivo, carrega
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if(file) {
+      if (file) {
         this.loadLocalPdf(file);
       }
     });
@@ -152,16 +152,16 @@ class MediaViewer {
 
   loadLocalPdf(file) {
     // Se já havia um PDF, libera da memória
-    if(this.currentPdfUrl) {
+    if (this.currentPdfUrl) {
       URL.revokeObjectURL(this.currentPdfUrl);
     }
 
     // Cria uma URL temporária do arquivo que o navegador entende
     this.currentPdfUrl = URL.createObjectURL(file);
-    
+
     // Injeta num iframe para leitura nativa
     this.content.innerHTML = `<iframe src="${this.currentPdfUrl}" width="100%" height="100%" style="border: none; border-radius: 8px; background: white;"></iframe>`;
-    
+
     // Atualiza botão da Toolbar para indicar que há um PDF ativo (Badge)
     this.btnPdf.classList.add('has-pdf');
     const t_reading = window.I18n ? window.I18n.t('media_reading') : 'Lendo: ';
@@ -170,17 +170,17 @@ class MediaViewer {
 
   closeAndClear() {
     this.dialog.close();
-    this.content.innerHTML = ''; 
+    this.content.innerHTML = '';
 
     // Limpeza de PDF
-    if(this.currentPdfUrl) {
+    if (this.currentPdfUrl) {
       URL.revokeObjectURL(this.currentPdfUrl);
       this.currentPdfUrl = null;
       this.btnPdf.classList.remove('has-pdf');
     }
 
     // Limpeza de Video
-    if(this.currentVideoUrl) {
+    if (this.currentVideoUrl) {
       if (this.currentVideoUrl.startsWith('blob:')) {
         URL.revokeObjectURL(this.currentVideoUrl);
       }
@@ -189,6 +189,8 @@ class MediaViewer {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.Viewer = new MediaViewer();
-});
+});*/
+
+export { MediaViewer };

@@ -196,6 +196,8 @@ class UIManager {
   }
 }
 
-window.addEventListener('load', () => {
-  window.UIManager = new UIManager();
-});
+//window.addEventListener('load', () => {
+//  window.UIManager = new UIManager();
+//});
+
+export { UIManager }; 

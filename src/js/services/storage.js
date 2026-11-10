@@ -12,7 +12,7 @@ class StorageService {
 
   initDB() {
     const request = indexedDB.open(this.dbName, 1);
-    
+
     request.onupgradeneeded = (e) => {
       this.db = e.target.result;
       if (!this.db.objectStoreNames.contains(this.storeName)) {
@@ -33,23 +33,23 @@ class StorageService {
   // --- Gerenciamento da Lousa Ativa ---
 
   saveSession(sessionData) {
-    if(!this.db) return;
+    if (!this.db) return;
     const tx = this.db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
     store.put({ id: 'current', data: sessionData, timestamp: Date.now() });
   }
 
   loadSession() {
-    if(!this.db) return;
+    if (!this.db) return;
     const tx = this.db.transaction(this.storeName, 'readonly');
     const store = tx.objectStore(this.storeName);
     const request = store.get('current');
-    
+
     request.onsuccess = (e) => {
       const result = e.target.result;
-      if(result && result.data && window.HistoryManager) {
-        if(!Array.isArray(result.data)) {
-           window.HistoryManager.loadFromStorage(result.data);
+      if (result && result.data && window.HistoryManager) {
+        if (!Array.isArray(result.data)) {
+          window.HistoryManager.loadFromStorage(result.data);
         }
       }
     };
@@ -58,11 +58,11 @@ class StorageService {
   // --- Gerenciamento da Biblioteca de Aulas ---
 
   saveLesson(title, callback) {
-    if(!this.db || !window.HistoryManager) return;
-    
+    if (!this.db || !window.HistoryManager) return;
+
     const tx = this.db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
-    
+
     // Captura o estado atual
     const sessionData = {
       boards: window.HistoryManager.boards,
@@ -72,7 +72,7 @@ class StorageService {
     // Se já houver uma aula carregada, atualiza ela. Senão cria uma nova.
     const isNew = !this.currentLessonId;
     const lessonId = this.currentLessonId || `lesson_${Date.now()}`;
-    
+
     const entry = {
       id: lessonId,
       title: title || 'Aula sem título',
@@ -84,19 +84,19 @@ class StorageService {
     request.onsuccess = () => {
       this.currentLessonId = lessonId;
       this.currentLessonTitle = entry.title;
-      if(callback) callback(true, entry, isNew);
+      if (callback) callback(true, entry, isNew);
     };
     request.onerror = () => {
-      if(callback) callback(false, null, false);
+      if (callback) callback(false, null, false);
     };
   }
 
   getAllLessons(callback) {
-    if(!this.db) {
-      if(callback) callback([]);
+    if (!this.db) {
+      if (callback) callback([]);
       return;
     }
-    
+
     const tx = this.db.transaction(this.storeName, 'readonly');
     const store = tx.objectStore(this.storeName);
     const request = store.getAll();
@@ -107,45 +107,47 @@ class StorageService {
       const lessons = results.filter(item => item.id !== 'current');
       // Ordena pelas mais recentes
       lessons.sort((a, b) => b.timestamp - a.timestamp);
-      if(callback) callback(lessons);
+      if (callback) callback(lessons);
     };
   }
 
   loadLesson(id, callback) {
-    if(!this.db) return;
+    if (!this.db) return;
     const tx = this.db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
     const request = store.get(id);
 
     request.onsuccess = (e) => {
       const result = e.target.result;
-      if(result && result.data && window.HistoryManager) {
+      if (result && result.data && window.HistoryManager) {
         // Define que esta é a aula ativa agora
         this.currentLessonId = id;
         this.currentLessonTitle = result.title;
         // Carrega para a tela
         window.HistoryManager.loadFromStorage(result.data);
         // Sobrescreve o current para a nova lousa ativa
-        this.saveSession(result.data); 
-        if(callback) callback(true);
+        this.saveSession(result.data);
+        if (callback) callback(true);
       } else {
-        if(callback) callback(false);
+        if (callback) callback(false);
       }
     };
   }
 
   deleteLesson(id, callback) {
-    if(!this.db) return;
+    if (!this.db) return;
     const tx = this.db.transaction(this.storeName, 'readwrite');
     const store = tx.objectStore(this.storeName);
     const request = store.delete(id);
 
     request.onsuccess = () => {
-      if(callback) callback(true);
+      if (callback) callback(true);
     };
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.StorageService = new StorageService();
-});
+});*/
+
+export { StorageService };

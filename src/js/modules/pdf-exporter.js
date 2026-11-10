@@ -2,7 +2,7 @@
 
 class PdfExporter {
   exportLesson(id) {
-    if(!window.StorageService || !window.StorageService.db) {
+    if (!window.StorageService || !window.StorageService.db) {
       alert("Banco de dados indisponível.");
       return;
     }
@@ -14,7 +14,7 @@ class PdfExporter {
 
     request.onsuccess = (e) => {
       const result = e.target.result;
-      if(result && result.data && result.data.boards) {
+      if (result && result.data && result.data.boards) {
         this.generatePdf(result.data.boards, result.title || "Lousa_Exportada");
       } else {
         alert("Dados da aula inválidos ou corrompidos.");
@@ -23,7 +23,7 @@ class PdfExporter {
   }
 
   async generatePdf(boards, title) {
-    if(!window.jspdf) {
+    if (!window.jspdf) {
       alert("Biblioteca jsPDF não carregou. Verifique se o PWA está funcionando corretamente offline.");
       return;
     }
@@ -45,7 +45,7 @@ class PdfExporter {
 
     for (let i = 0; i < boards.length; i++) {
       const board = boards[i];
-      
+
       // 1. Pinta o fundo do quadro
       if (window.BackgroundManager) {
         window.BackgroundManager.render(ctx, offCanvas.width, offCanvas.height, board.bg);
@@ -56,26 +56,26 @@ class PdfExporter {
       }
 
       // 2. Renderiza os traços simulando o History
-      if(board.strokes && board.strokes.length > 0) {
+      if (board.strokes && board.strokes.length > 0) {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
         board.strokes.forEach(stroke => {
           if (!stroke.points || stroke.points.length === 0) return;
-          
+
           let p0 = stroke.points[0];
-          
+
           const scaleRatio = offCanvas.width / (window.innerWidth || 1280);
-          
+
           ctx.beginPath();
           const startX = p0.x * scaleRatio;
           const startY = p0.y * scaleRatio;
           ctx.moveTo(startX, startY);
-          
+
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           ctx.lineWidth = stroke.lineWidth * (p0.pressure * 2) * scaleRatio;
-          
+
           if (stroke.tool === 'eraser') {
             ctx.globalCompositeOperation = 'destination-out';
             ctx.strokeStyle = 'rgba(0,0,0,1)';
@@ -92,35 +92,35 @@ class PdfExporter {
           let ctrlY = startY;
 
           for (let p = 1; p < stroke.points.length; p++) {
-             const pt = stroke.points[p];
-             const ptX = pt.x * scaleRatio;
-             const ptY = pt.y * scaleRatio;
+            const pt = stroke.points[p];
+            const ptX = pt.x * scaleRatio;
+            const ptY = pt.y * scaleRatio;
 
-             const midX = lastX + (ptX - lastX) / 2;
-             const midY = lastY + (ptY - lastY) / 2;
-             
-             ctx.beginPath();
-             ctx.moveTo(ctrlX, ctrlY);
-             
-             ctx.lineCap = 'round';
-             ctx.lineJoin = 'round';
-             ctx.lineWidth = stroke.lineWidth * (pt.pressure * 2) * scaleRatio;
-             
-             if (stroke.tool === 'eraser') {
-               ctx.globalCompositeOperation = 'destination-out';
-               ctx.strokeStyle = 'rgba(0,0,0,1)';
-             } else {
-               ctx.globalCompositeOperation = 'source-over';
-               ctx.strokeStyle = stroke.color;
-             }
+            const midX = lastX + (ptX - lastX) / 2;
+            const midY = lastY + (ptY - lastY) / 2;
 
-             ctx.quadraticCurveTo(lastX, lastY, midX, midY);
-             ctx.stroke();
-             
-             ctrlX = midX;
-             ctrlY = midY;
-             lastX = ptX;
-             lastY = ptY;
+            ctx.beginPath();
+            ctx.moveTo(ctrlX, ctrlY);
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = stroke.lineWidth * (pt.pressure * 2) * scaleRatio;
+
+            if (stroke.tool === 'eraser') {
+              ctx.globalCompositeOperation = 'destination-out';
+              ctx.strokeStyle = 'rgba(0,0,0,1)';
+            } else {
+              ctx.globalCompositeOperation = 'source-over';
+              ctx.strokeStyle = stroke.color;
+            }
+
+            ctx.quadraticCurveTo(lastX, lastY, midX, midY);
+            ctx.stroke();
+
+            ctrlX = midX;
+            ctrlY = midY;
+            lastX = ptX;
+            lastY = ptY;
           }
 
           if (stroke.points.length > 1) {
@@ -136,8 +136,8 @@ class PdfExporter {
 
       // Converte para imagem PNG
       const imgData = offCanvas.toDataURL('image/png', 1.0);
-      
-      if(i > 0) doc.addPage();
+
+      if (i > 0) doc.addPage();
 
       // Dimensões da folha A4 Paisagem (297x210 mm)
       doc.addImage(imgData, 'PNG', 0, 0, 297, 210);
@@ -149,6 +149,8 @@ class PdfExporter {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.PdfExporter = new PdfExporter();
-});
+});*/
+
+export { PdfExporter };

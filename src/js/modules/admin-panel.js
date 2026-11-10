@@ -5,7 +5,7 @@ class AdminPanel {
     this.btnAdmin = document.getElementById('btn-admin');
     this.dialog = document.getElementById('admin-dialog');
     this.btnClose = document.getElementById('btn-close-admin');
-    
+
     this.inputTitle = document.getElementById('lesson-title-input');
     this.btnNew = document.getElementById('btn-new-lesson');
     this.btnSave = document.getElementById('btn-save-lesson');
@@ -17,7 +17,7 @@ class AdminPanel {
   bindEvents() {
     this.btnAdmin.addEventListener('click', () => {
       this.refreshList();
-      if(window.StorageService) {
+      if (window.StorageService) {
         this.inputTitle.value = window.StorageService.currentLessonTitle || '';
       }
       this.dialog.showModal();
@@ -27,16 +27,16 @@ class AdminPanel {
       this.dialog.close();
     });
 
-    if(this.btnNew) {
+    if (this.btnNew) {
       this.btnNew.addEventListener('click', () => {
         const msg = window.I18n ? window.I18n.t('lib_confirm_new') : "Deseja criar uma nova aula em branco? Qualquer alteração não salva na atual será perdida!";
-        if(confirm(msg)) {
+        if (confirm(msg)) {
           this.inputTitle.value = '';
-          if(window.StorageService) {
+          if (window.StorageService) {
             window.StorageService.currentLessonId = null;
             window.StorageService.currentLessonTitle = '';
           }
-          if(window.HistoryManager) {
+          if (window.HistoryManager) {
             window.HistoryManager.boards = [{ id: Date.now(), strokes: [], redoStack: [], bg: { type: 'solid', color: '#1e1e1e' } }];
             window.HistoryManager.currentIndex = 0;
             window.HistoryManager.changeBoard();
@@ -52,10 +52,10 @@ class AdminPanel {
         alert(window.I18n ? window.I18n.t('lib_save_err') : "Por favor, digite um nome para a aula!");
         return;
       }
-      
-      if(window.StorageService) {
+
+      if (window.StorageService) {
         window.StorageService.saveLesson(title, (success, entry, isNew) => {
-          if(success) {
+          if (success) {
             this.refreshList();
             const msg = isNew ? "Aula salva com sucesso na Biblioteca!" : "Aula atualizada com sucesso!";
             alert(window.I18n ? window.I18n.t('lib_save_success') : msg);
@@ -68,7 +68,7 @@ class AdminPanel {
   }
 
   refreshList() {
-    if(window.StorageService) {
+    if (window.StorageService) {
       window.StorageService.getAllLessons((lessons) => {
         this.renderList(lessons);
       });
@@ -77,7 +77,7 @@ class AdminPanel {
 
   renderList(lessons) {
     this.lessonsList.innerHTML = '';
-    
+
     if (lessons.length === 0) {
       const msgEmpty = window.I18n ? window.I18n.t('lib_empty') : 'Nenhuma aula salva ainda.';
       this.lessonsList.innerHTML = `<p style="color: #888; text-align: center;">${msgEmpty}</p>`;
@@ -86,7 +86,7 @@ class AdminPanel {
 
     lessons.forEach(lesson => {
       const date = new Date(lesson.timestamp).toLocaleString();
-      
+
       const item = document.createElement('div');
       item.style.cssText = `
         display: flex; justify-content: space-between; align-items: center; 
@@ -131,9 +131,9 @@ class AdminPanel {
 
   openLesson(id) {
     const msg = window.I18n ? window.I18n.t('lib_confirm_load') : "Deseja realmente carregar esta aula? O quadro atual não salvo será perdido!";
-    if(confirm(msg)) {
+    if (confirm(msg)) {
       window.StorageService.loadLesson(id, (success) => {
-        if(success) {
+        if (success) {
           this.dialog.close();
         } else {
           const err = window.I18n ? window.I18n.t('lib_load_error') : "Erro ao carregar a aula.";
@@ -145,9 +145,9 @@ class AdminPanel {
 
   deleteLesson(id) {
     const msg = window.I18n ? window.I18n.t('lib_confirm_del') : "Tem certeza que deseja apagar esta aula definitivamente?";
-    if(confirm(msg)) {
+    if (confirm(msg)) {
       window.StorageService.deleteLesson(id, (success) => {
-        if(success) {
+        if (success) {
           this.refreshList();
         }
       });
@@ -155,7 +155,7 @@ class AdminPanel {
   }
 
   generatePdf(id) {
-    if(window.PdfExporter) {
+    if (window.PdfExporter) {
       window.PdfExporter.exportLesson(id);
     } else {
       alert(window.I18n ? window.I18n.t('lib_pdf_err') : "Módulo PDF não está carregado.");
@@ -163,6 +163,8 @@ class AdminPanel {
   }
 }
 
-window.addEventListener('load', () => {
+/*window.addEventListener('load', () => {
   window.AdminPanelModule = new AdminPanel();
-});
+});*/
+
+export { AdminPanel };
