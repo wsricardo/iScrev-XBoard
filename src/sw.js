@@ -1,17 +1,25 @@
-const CACHE_NAME = 'xboard-cache-v2.99.5';
+const CACHE_NAME = 'xboard-cache-v3.1.0';
 const urlsToCache = [
   './index.html',
+  './manifest.json',
   './css/style.css',
   './css/modals.css',
+  './assets/icons/icon-192x192.png',
+  './assets/icons/icon-512x512.png',
+  './icons/icon.ico',
+  './js/app.js',
   './js/libs/jspdf.umd.min.js',
   './js/core/canvas-engine.js',
   './js/core/history.js',
-  './js/modules/ui-manager.js',
-  './js/modules/media-viewer.js',
-  './js/modules/recorder.js',
   './js/services/storage.js',
+  './js/modules/admin-panel.js',
   './js/modules/background-manager.js',
-  './js/app.js'
+  './js/modules/i18n.js',
+  './js/modules/media-viewer.js',
+  './js/modules/pdf-exporter.js',
+  './js/modules/pwa-manager.js',
+  './js/modules/recorder.js',
+  './js/modules/ui-manager.js'
 ];
 
 self.addEventListener('install', event => {
@@ -45,7 +53,7 @@ self.addEventListener('fetch', event => {
           }
           return networkResponse;
         }).catch(() => {
-          // Fallback silencioso
+          // Fallback silencioso offline
         });
         return response || fetchPromise;
       });

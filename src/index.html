@@ -14,6 +14,8 @@
     </script>
 
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/icons/icon-192x192.png">
+    <link rel="shortcut icon" href="icons/icon.ico">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modals.css">
 
@@ -31,6 +33,12 @@
 
     <!-- Barra de Ferramentas UI -->
     <nav id="toolbar">
+        <!-- Navegação do Ecossistema iScrev -->
+        <div class="tool-group brand-tools">
+            <a href="https://www.iscrev.com/" class="tool-btn" id="btn-portal-home" data-i18n-title="nav_home" title="Início iScrev" aria-label="Ir para a página inicial">🏠</a>
+            <a href="https://www.iscrev.com/diario.html" class="tool-btn" id="btn-portal-notes" data-i18n-title="nav_notes" title="Abrir Caderno iScrev Notes" aria-label="Abrir Caderno iScrev Notes" target="_blank">📖</a>
+        </div>
+
         <div class="tool-group primary-tools" style="border-right: none;">
             <button class="tool-btn active" id="btn-pen" data-i18n-title="tool_pen">✏️</button>
             <button class="tool-btn" id="btn-eraser" data-i18n-title="tool_eraser">🧼</button>

@@ -18,7 +18,7 @@ O objetivo da **Versão 2.0** é transformar o XBoard em uma **suíte profission
 1. **Modularidade e Robustez Estrutural:** Desacoplamento total do objeto global `window`, adoção de ES Modules e tipagem estrita com TypeScript.
 2. **Alta Performance e Eficiência Vetorial:** Algoritmos de simplificação de traços (RDP), tela infinita com aceleração de hardware e pan/zoom fluido.
 3. **Expansão de Capacidades Didáticas:** Formas geométricas, caneta marca-texto inteligente, caixas de texto tipográfico e camadas (layers).
-4. **Confiabilidade de Dados e Cache PWA:** Sincronização offline à prova de falhas com Workbox, backup/exportação de aulas e exportação de PDF vetorial sem distorções de proporção.
+4. **Confiabilidade de Dados e Cache PWA:** Sincronização offline  à prova de falhas com Workbox, backup/exportação de aulas e exportação de PDF vetorial sem distorções de proporção.
 
 ---
 

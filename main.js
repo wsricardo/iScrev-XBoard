@@ -1,4 +1,4 @@
-const { app, BrowserWindow, desktopCapturer, session } = require('electron');
+const { app, BrowserWindow, desktopCapturer, session, shell } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -13,6 +13,15 @@ function createWindow() {
       contextIsolation: true,
       webviewTag: true // Habilita webviews para rodar YouTube isolado do file://
     }
+  });
+
+  // Abre links externos (como portal e notas) no navegador padrao
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:') || url.startsWith('http:')) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+    return { action: 'allow' };
   });
 
   mainWindow.loadFile('src/index.html');

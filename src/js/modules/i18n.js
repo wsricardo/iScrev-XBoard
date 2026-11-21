@@ -7,6 +7,8 @@ class I18n {
     this.dictionary = {
       'pt-BR': {
         // Toolbar
+        'nav_home': 'Início iScrev',
+        'nav_notes': 'Abrir Caderno iScrev Notes',
         'tool_pen': 'Caneta',
         'tool_eraser': 'Borracha',
         'tool_clear': 'Limpar Lousa',
@@ -71,6 +73,8 @@ class I18n {
       },
       'en': {
         // Toolbar
+        'nav_home': 'iScrev Home',
+        'nav_notes': 'Open iScrev Notes',
         'tool_pen': 'Pen',
         'tool_eraser': 'Eraser',
         'tool_clear': 'Clear Board',

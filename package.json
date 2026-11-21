@@ -11,7 +11,9 @@
     "start": "electron .",
     "dev": "electron .",
     "build": "electron-builder",
-    "build:web": "powershell -Command \"New-Item -ItemType Directory -Force -Path build_web; Copy-Item -Path src\\* -Destination build_web -Recurse -Force\""
+    "build:web": "node scripts/build-web.js",
+    "sync:site": "node scripts/sync-to-iscrev.js",
+    "check": "node --check src/js/app.js"
   },
   "build": {
     "appId": "com.iscrevxboard.app",
