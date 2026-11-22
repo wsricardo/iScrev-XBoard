@@ -17,6 +17,10 @@
   },
   "build": {
     "appId": "com.iscrevxboard.app",
+    "publish": {
+      "provider": "github",
+      "releaseType": "release"
+    },
     "productName": "iScrev XBoard",
     "directories": {
       "output": "dist"
