@@ -1,24 +1,28 @@
 # Esquema de Desenvolvimento & Roadmap Técnico: iScrev XBoard v2.0
 
 > **Documento:** Mapa Estratégico de Evolução, Melhorias e Refatoração Técnica (`SchemeDev20.md`)  
-> **Versão de Referência:** iScrev XBoard v1.4.1 $\rightarrow$ v2.0  
+> **Versão de Referência:** iScrev XBoard v1.4.2 $\rightarrow$ v2.0  
 > **Autor & Idealizador:** Wandeson Ricardo (WSRicardo)  
 > **Localização:** `src/v2.0/SchemeDev20.md`  
-> **Status:** Planejamento e Arquitetura de Especificação  
+> **Status:** Planejamento e Arquitetura de Especificação (Atualizado pós-v1.4.2)  
 
 ---
 
 ## 1. Visão Geral e Diretrizes da Versão 2.0
 
-A versão 1.4.1 do **iScrev XBoard** consolidou com sucesso os fundamentos da aplicação: uma lousa digital funcional em Vanilla JS, operando de maneira híbrida como PWA e aplicativo Desktop Electron, com renderização via curvas de Bézier e persistência local no IndexedDB.
+A série **v1.4.x (v1.4.1 / v1.4.2)** do **iScrev XBoard** consolidou com sucesso os fundamentos da aplicação: uma lousa digital funcional operando de maneira híbrida como PWA e aplicativo Desktop Electron, com renderização via curvas de Bézier, persistência local no IndexedDB e esteira CI/CD de builds automatizados no GitHub Actions.
 
-No entanto, o crescimento orgânico de funcionalidades (biblioteca de aulas, visualizador multimídia, gravador de vídeo e exportação PDF) gerou acoplamento estrutural e débitos técnicos que limitam a escalabilidade do software.
+No entanto, a análise do estado prático do repositório revela pontos de atrito arquiteturais que motivam o salto para a **Versão 2.0**:
+- **Acoplamento Global no DOM:** Módulos dependem do escopo `window` (`window.Engine`, `window.HistoryManager`, `window.BackgroundManager`). Inconsistências nessa nomenclatura (ex: `window.History` vs `window.HistoryManager`) evidenciaram a fragilidade desse padrão.
+- **Transição Incompleta para ES Modules:** Arquivos modernos como `app.js` e `canvas-engine.js` já contêm sintaxe `import`/`export`, mas o `index.html` ainda carregava scripts tradicionais sem `type="module"`, gerando risco de erros de carregamento e execução.
+- **Cache Estático no Service Worker (`sw.js`):** A estratégia *Cache-First* sem hash automático de assets exige incrementos manuais de versão (`xboard-cache-vX.Y`), correndo o risco de congelar scripts desatualizados nos navegadores dos usuários.
+- **Sobrecarga de Dados Vetoriais:** Em aulas de longa duração, o armazenamento de centenas de milhares de coordenadas brutas sem simplificação poligonal eleva o consumo de RAM e os tempos de gravação no IndexedDB.
 
 O objetivo da **Versão 2.0** é transformar o XBoard em uma **suíte profissional de ilustração e ensino digital**, orientada por quatro pilares:
-1. **Modularidade e Robustez Estrutural:** Desacoplamento total do objeto global `window`, adoção de ES Modules e tipagem estrita com TypeScript.
-2. **Alta Performance e Eficiência Vetorial:** Algoritmos de simplificação de traços (RDP), tela infinita com aceleração de hardware e pan/zoom fluido.
-3. **Expansão de Capacidades Didáticas:** Formas geométricas, caneta marca-texto inteligente, caixas de texto tipográfico e camadas (layers).
-4. **Confiabilidade de Dados e Cache PWA:** Sincronização offline  à prova de falhas com Workbox, backup/exportação de aulas e exportação de PDF vetorial sem distorções de proporção.
+1. **Modularidade e Robustez Estrutural:** Desacoplamento total do objeto global `window`, adoção plena de ES Modules e tipagem estrita com TypeScript gerenciada via Vite.
+2. **Alta Performance e Eficiência Vetorial:** Algoritmos de simplificação de traços (Ramer-Douglas-Peucker - RDP), tela infinita com aceleração de hardware e navegação bidimensional (Pan/Zoom fluida).
+3. **Expansão de Capacidades Didáticas:** Formas geométricas inteligentes (retângulos, círculos, setas, linhas ortogonais com `Shift`), caneta marca-texto real (`multiply`), caixas de texto tipográfico e anotação direta sobre imagens.
+4. **Confiabilidade de Dados e Cache PWA:** Estratégia de pré-cache automático gerada em tempo de build com Vite-Plugin-PWA / Workbox, exportação e importação de backup de aulas em arquivo único `.xboard`, e renderização de PDF vetorial em proporção A4 sem deformação de tela.
 
 ---
 
@@ -72,20 +76,30 @@ quadrantChart
 ### 3.1. Eixo 1: Arquitetura de Software, Build e Modularização
 
 #### Ponto Crítico Atual
-Atualmente, todo o sistema é carregado via 11 tags `<script>` sequenciais em `src/index.html`. O acoplamento se dá expondo instâncias únicas no objeto global:
+Atualmente, todo o sistema é carregado via tags `<script>` sequenciais em `src/index.html` ou pelo esboço modular em `app.js`. O acoplamento se dá expondo instâncias no objeto global:
 ```javascript
+window.BackgroundManager = new BackgroundManager();
 window.Engine = new CanvasEngine('main-canvas');
 window.HistoryManager = new History();
 window.StorageService = new StorageService();
 window.UIManager = new UIManager();
 ```
-Essa abordagem impede testes unitários automatizados, favorece efeitos colaterais ocultos e cria dependência estrita da ordem de importação no HTML.
+Essa abordagem cria dependência frágil da ordem de execução, dificulta testes automatizados e gera riscos de quebras silenciosas caso nomes de variáveis divirjam entre módulos (ex: `window.History` vs `window.HistoryManager`). Além disso, chamadas sem parâmetros obrigatórios (como `window.BackgroundManager.render()` sem o contexto `ctx`) provocam exceções imediatas em tempo de execução.
 
 #### Mudanças Recomendadas para a v2.0
 1. **Adoção do Vite como Bundler Oficial:**
-   - Tempo de inicialização em milissegundos com Hot Module Replacement (HMR).
-   - Suporte nativo a ES Modules (`import { CanvasEngine } from './core/canvas-engine'`).
-   - Geração de pacote otimizado para produção com minificação e *tree-shaking*.
+   - Inicialização instantânea com Hot Module Replacement (HMR).
+   - Suporte nativo a ES Modules reais (`import { CanvasEngine } from './core/canvas-engine'`).
+   - Geração de pacote otimizado para produção com minificação, *code-splitting* e *tree-shaking*.
+   - Resolução transparente de assets de bibliotecas externas (eliminando avisos como o 404 de source-maps em `jspdf.umd.min.js.map`).
+2. **Padrão Mediator / EventBus Tipado:**
+   - Eliminar referências diretas de instâncias cruzadas (`History` chamando `Engine`, `UIManager` chamando `HistoryManager`).
+   - Criar um canal central de eventos tipado:
+     ```typescript
+     // Exemplo de barramento de eventos na v2.0
+     eventBus.on('board:background-changed', ({ bgConfig }) => canvasEngine.drawBackground(bgConfig));
+     eventBus.on('history:undo', () => canvasEngine.redrawHistory(history.currentBoard.strokes));
+     ```
 2. **Migração Gradual para TypeScript:**
    - Criar definições de tipos para contratos cruciais:
      ```typescript
@@ -278,6 +292,28 @@ O [main.js](file:///c:/Users/wsric/OneDrive/Documentos/GitHub/iScrev-XBoard/main
      - **Windows:** NSIS Installer e Portable (existentes).
      - **Linux:** Pacotes `.AppImage` e `.deb`.
      - **macOS:** Pacote `.dmg` universal (Apple Silicon e Intel).
+
+---
+
+### 3.7. Eixo 7: Esteira de CI/CD e Distribuição de Releases (GitHub Actions)
+
+#### Diagnóstico Atual (v1.4.2)
+- O workflow `.github/workflows/release.yml` compila instaladores Windows (`NSIS` e `Portable`) ao receber tags `v*.*.*`.
+- Contudo, o `electron-builder` cria os releases como **Draft (Rascunho)** por padrão. Disparos concomitantes de tag e commit geram drafts duplicados no GitHub, exigindo intervenção manual para exclusão do rascunho órfão e publicação pública.
+
+#### Melhorias Recomendadas para a v2.0
+1. **Publicação Direta ou Controle de Concorrência no Workflow:**
+   - Adicionar controle de concorrência (`concurrency`) no GitHub Actions para impedir jobs paralelos competindo pela mesma tag.
+   - Configurar publicação definitiva sem retenção em rascunho quando aprovado:
+     ```json
+     // package.json (build.publish)
+     "publish": {
+       "provider": "github",
+       "releaseType": "release"
+     }
+     ```
+2. **Matriz Multiplataforma Real (Windows, Linux, macOS):**
+   - Executar builds paralelos com matriz de jobs (`windows-latest`, `ubuntu-latest`, `macos-latest`), disponibilizando `.AppImage`, `.deb` e `.dmg` automaticamente na aba de releases.
 
 ---
 

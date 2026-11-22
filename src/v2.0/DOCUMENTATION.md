@@ -1,10 +1,10 @@
 # Documentação Arquitetural e Técnica do Projeto: iScrev XBoard
 
-> **Versão Base Analisada:** v1.4.1  
+> **Versão Base Analisada:** v1.4.2  
 > **Status:** Produção Estável (Desktop & PWA)  
 > **Autor & Mantenedor:** Wandeson Ricardo (WSRicardo)  
 > **Destino Deste Documento:** Planejamento e Base Técnica para o Desenvolvimento da Versão 2.0 (`src/v2.0/`)  
-> **Data de Análise:** Outubro de 2026  
+> **Última Atualização:** Novembro de 2026  
 
 ---
 
